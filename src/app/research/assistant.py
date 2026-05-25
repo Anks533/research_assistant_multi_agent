@@ -6,7 +6,7 @@ from agents import gen_trace_id, trace, custom_span, Runner, flush_traces
 from app.model.research_models import ResearchReport
 from app.exception.exceptions import MultiAgentResearchException
 from app.research.agent_tools import Toolset
-from app.helper.helper import get_manager_agent
+from app.helper.helper import get_manager_agent, get_analyst_agent
 
 logger:logging.Logger = get_logger("ResearchAssistant")
 
@@ -55,9 +55,22 @@ class ResearchAssistant:
                     "query": query
                 }
             ):
+                analyst_tool = get_analyst_agent().as_tool(
+                    tool_name="write_markdown_research_report",
+                    tool_description="Write the final structured Markdown research report from the gathered evidence.",
+                )
+
                 tool_set = Toolset(self.settings)
+                tools:dict = [
+                    tool_set.answer_query,
+                    tool_set.judge_answer_quality,
+                    tool_set.search_with_scrape,
+                    tool_set.search_web,
+                    tool_set.scrape_url,
+                    analyst_tool,
+                ]
                 result = await Runner.run(
-                    starting_agent=get_manager_agent(tool_set),
+                    starting_agent=get_manager_agent(tools),
                     input=prompt,
                     max_turns=20
                 )

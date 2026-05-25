@@ -1,6 +1,6 @@
-from openai import function_tool
+
 from app.exception.exceptions import OlostepError
-from agents import custom_span, Agent, Runner, RunResult
+from agents import custom_span, Agent, Runner, RunResult, function_tool
 from app.config.settings import Settings
 from app.helper.helper import get_olostep_client, convert_to_json_string, get_judge_agent, normalize_search_links
 from olostep.models.response import AnswersResponse

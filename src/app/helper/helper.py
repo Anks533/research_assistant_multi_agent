@@ -1,7 +1,6 @@
 from olostep import Olostep
 from app.config.settings import Settings
 from app.agent.instruction.instructions import MANAGER_AGENT_INSTRUCTIONS, JUDGE_AGENT_INSTRUCTIONS, ANALYST_AGENT_INSTRUCTIONS
-from app.research.agent_tools import Toolset
 from agents import Agent
 from app.model.research_models import ResearchReport, Judgement, MarkdownResearchReport
 from typing import Any
@@ -24,20 +23,8 @@ def convert_to_json_string(resp: dict, max_chars: int = 5000) -> str:
     return text[:max_chars] + "\n... [truncated]"
 
 """ create and return manager/orchestrator agent. """
-def get_manager_agent(tool_set: Toolset) -> Agent:
-    analyst_tool = _get_analyst_agent().as_tool(
-        tool_name="write_markdown_research_report",
-        tool_description="Write the final structured Markdown research report from the gathered evidence.",
-    )
+def get_manager_agent(tools: dict) -> Agent:
     name: str = "Manager Agent"
-    tools: dict = [
-        tool_set.answer_query,
-        tool_set.judge_answer_quality,
-        tool_set.search_with_scrape,
-        tool_set.search_web,
-        tool_set.scrape_url,
-        analyst_tool,
-    ]
     return _create_agent(name, MANAGER_AGENT_INSTRUCTIONS, tools, ResearchReport)
     
 """ create and return judge agent. """
@@ -45,7 +32,7 @@ def get_judge_agent() -> Agent:
     name: str = "Judge Agent"
     return _create_agent(name, JUDGE_AGENT_INSTRUCTIONS, None, Judgement)
 
-def _get_analyst_agent() -> Agent:
+def get_analyst_agent() -> Agent:
     name: str = "Analyst Agent"
     return _create_agent(name, ANALYST_AGENT_INSTRUCTIONS, None, MarkdownResearchReport)
 
