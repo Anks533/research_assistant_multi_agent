@@ -1,0 +1,42 @@
+# python
+__pycache__
+dist/
+build/
+.eggs/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info
+*.egg
+
+# Virtual environment
+.venv
+venv
+research_assistant_env
+env/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.hypothesis/
+htmlcov/
+.coverage
+coverage.xml
+
+# mypy
+.mypy_cache/
+
+# ruff
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db

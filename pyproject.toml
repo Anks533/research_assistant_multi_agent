@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "research_assistant"
+version = "0.1.0"
+description = "It will perform research on a user query using multi agent system"
+readme = "README.md"
+requires-python = ">=3.11"
+license="MIT"
+dependencies = [
+    "olostep>=1.1.0",
+    "openai-agents>=0.17.1",
+    "markdown>=3.10.2",
+    "reportlab>=4.0.4",
+    "pydantic>=2.13.4",
+    "python-dotenv>=1.2.2",
+    "pydantic-settings>=2.1.0", # .env file loading
+]
+
+# These are not required to run app - only to develop it. So to keep production deployment lighter.
+# These can be installed by explicity:  pip install -e ".[dev]"
+[project.optional-dependencies]
+dev=[
+    "hypothesis>=6.92.0",
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0"
+]
+
+[tool.hatch.build.targets.wheel]
+packages=["src/app"]
+
+[tool.pytest.ini_options]
+testpaths=["tests"]
+asyncio_mode="auto"
+markers=[
+    "property: property-based tests using Hypothesis", # custom label
+    "integration: integration test requiring external services" # custom label
+]
+
+[tool.ruff]
+target-version="py314"
+src=["src", "tests"]
+
+[tool.ruff.lint]
+select=[
+    "E", #pycodestyle errors
+    "W", #pycodestyle warnings
+    "F", #Unused imports, undefined names - [pyflakes]
+    "I", #Import ordering - [isort]
+    "N", #Naming conventions - [pep8-naming]
+    "UP", #Suggest modern python syntax - [pyupgrade]
+    "B", #Common bugs - [flake8-bugbear]
+    "SIM" #Code simplification suggestions - [flake8-simplify]
+]
+
+# Type checking
+[tool.mypy]
+python-version = "3.14"
+strict = true # Enforce type hints everywhere
+warn_return_any=true # Flag functions returning `Any`
+warn_unused_configs=true
+plugins=["pydantic.mypy"] # Understands Pydantic models
+
+
