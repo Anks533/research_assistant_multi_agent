@@ -12,3 +12,6 @@ class Judgement(BaseModel):
         description="List all important gaps that need to be fixed."
     )
 
+class MarkdownResearchReport(BaseModel):
+    """"""
+

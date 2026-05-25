@@ -2,7 +2,7 @@ from openai import function_tool
 from app.exception.exceptions import OlostepError
 from agents import custom_span, Agent, Runner, RunResult
 from app.config.settings import Settings
-from app.helper.helper import get_olostep_client, convert_to_json_string, get_judge_agent
+from app.helper.helper import get_olostep_client, convert_to_json_string, get_judge_agent, normalize_search_links
 from olostep.models.response import AnswersResponse
 from app.model.research_models import Judgement
 from app.config.logging import get_logger
@@ -59,19 +59,36 @@ class Toolset:
         
 
     @function_tool
-    async def search_with_scrape(self, query: str) -> list:
+    async def search_with_scrape(self, query: str, limit: int = 5) -> list:
         """Search the web and scrape relevant sources."""
-        ...
+        try:
+            logger.debug("Search API Invoked....")
+            result = await asyncio.to_thread(self._search_with_scrape_impl, query, limit)
+            logger.debug("Search API Completed....")
+            logger.debug("Search Result :: \n")
+            logger.debug(result)
+        except Exception as exc:
+            raise OlostepError(f"Olostep Search with Scrape failed: {exc}") from exc
+        return result
 
+        
     @function_tool
-    async def search_web(self, query: str) -> list:
-        """Perform targeted web search."""
-        ...
+    async def search_web(self, query: str, limit: int = 8) -> list:
+        """Search the web using Olostep Search and return normalized results."""
+        try:
+            result = await asyncio.to_thread(self._search_web_impl, query, limit)
+        except Exception as exc:
+            raise OlostepError(f"Olostep Search API failed: {exc}") from exc
+        return result
 
     @function_tool
     async def scrape_url(self, url: str) -> str:
-        """Scrape a web page for content."""
-        ...
+        """Scrape one URL with Olostep and return compact page content."""
+        try:
+            result = await asyncio.to_thread(self._scrape_url_impl, url)
+        except Exception as exc:
+            raise OlostepError(f"Olostep Scrape API failed: {exc}") from exc
+        return result
 
 
     """ call Answer api and return json string response. """
@@ -85,6 +102,41 @@ class Toolset:
             result: AnswersResponse = get_olostep_client(self.settings).answers.create(task=query)
             result_dict: dict = vars(result)
             return convert_to_json_string(result_dict)
+        
+    def _search_with_scrape_impl(self, query: str, limit: int = 5) -> str:
+        scrape_options = {"formats":["markdown"], "timeout": 25}
+        with custom_span("olostep.search_with_scrape", {"query": query, "limit": limit, "scrape_options": scrape_options}):
+            search = get_olostep_client().searches.create(
+                query=query,
+                limit=limit,
+                scrape_options=scrape_options
+            )
+            data = {key: value for key, value in vars(search).items() if not key.startswith("_")}
+            return convert_to_json_string({
+                "query": query,
+                "results": normalize_search_links(data.get("links", []), limit=limit),
+                "raw": data
+            }, max_chars=12000)
+    
+    def _scrape_url_impl(url: str) -> str:
+        with custom_span("olostep.scrape_url", {"url": url, "formats": ["markdown"]}):
+            scrape = get_olostep_client().scrapes.create(url=url, formats=["markdown"])
+            return convert_to_json_string(
+                {"url": url, "scrape": {key: value for key, value in vars(scrape).items() if not key.startswith("_")}}, max_chars=10000
+            )
+        
+    def _search_web_impl(query: str, limit: int = 8) -> str:
+        with custom_span("olostep.search_web", {"query": query, "limit": limit}):
+            search = get_olostep_client().searches.create(query=query, limit=limit)
+            data = {key: value for key, value in vars(search).items() if not key.startswith("_")}
+            return convert_to_json_string(
+                {
+                    "query": query,
+                    "results": normalize_search_links(data.get("links", []), limit=limit),
+                    "raw": data,
+             }
+            )
+
 
             
         
