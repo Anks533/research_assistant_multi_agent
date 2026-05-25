@@ -14,7 +14,8 @@ def main():
     logger.info("Environment loaded successfully...")
 
     # 3️⃣ Run app
-    ResearchAssistant.run_research("Tell me about how AI is changing our life?")
+    researchAgent = ResearchAssistant(settings)
+    researchAgent.run_research("Tell me about how AI is changing our life?")
 
     logger.info("Application shutdown...")
 

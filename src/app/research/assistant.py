@@ -1,102 +1,20 @@
 import logging
 
 from app.config.logging import get_logger
-from agents import gen_trace_id, trace, custom_span, Runner, Agent, flush_traces
-from datetime import datetime
-from app.research.agent_tools import (
-    answer_query,
-    judge_answer_quality,
-    search_web,
-    scrape_url,
-    search_with_scrape
-)
-from app.model.research_report import ResearchReport
+from app.config.settings import Settings
+from agents import gen_trace_id, trace, custom_span, Runner, flush_traces
+from app.model.research_models import ResearchReport
 from app.exception.exceptions import MultiAgentResearchException
+from app.research.agent_tools import Toolset
+from app.helper.helper import get_manager_agent
 
 logger:logging.Logger = get_logger("ResearchAssistant")
 
-MANAGER_INSTRUCTIONS = f"""
-You are a WORKFLOW ORCHESTRATOR for a multi-agent research assistant.
-
-Your role is to MANAGE the RESEARCH PROCESS.
-You MUST NOT answer from your own internal or parametric knowledge.
-All conclusions MUST be derived strictly from tool outputs.
-
-────────────────────────────────────────
-TIME SENSITIVITY & QUERY NORMALIZATION
-────────────────────────────────────────
-• For topics that are current, recent, latest, ongoing, or time-sensitive:
-  - If the user query does NOT mention a year, append the current year ({datetime.now().year})
-    to the following tool inputs:
-      • answer_query
-      • search_with_scrape
-      • search_web
-  - If the user query already includes a year, preserve it exactly.
-• Do NOT treat older sources as sufficient when newer coverage is required.
-
-────────────────────────────────────────
-MANDATORY WORKFLOW POLICY (STRICT)
-────────────────────────────────────────
-You MUST follow the steps below EXACTLY and IN ORDER.
-You are NOT allowed to skip, reorder, or repeat steps unless explicitly stated.
-
-1. INITIAL ANSWER
-   - ALWAYS call answer_query first using the normalized user question.
-   - Do NOT perform any other action before this step.
-
-2. FIRST JUDGMENT
-   - IMMEDIATELY call judge_answer_quality using:
-     • the original user question
-     • the answer_query result
-   - If judge returns:
-       is_good_enough = true AND score >= 0.85
-     → STOP ALL RESEARCH and proceed directly to step 5.
-
-3. SECOND PASS (SCRAPED SEARCH)
-   - If the first judgment is insufficient:
-     • Call search_with_scrape using the original user question.
-     • IMMEDIATELY call judge_answer_quality again using:
-         - original question
-         - answer_query result
-         - first judgment
-         - search_with_scrape result
-   - If this second judgment returns:
-       is_good_enough = true AND score >= 0.85
-     → STOP ALL RESEARCH and proceed directly to step 5.
-
-4. DEEP RESEARCH (NO FURTHER JUDGING)
-   - If the second judgment is still insufficient:
-     • DO NOT call judge_answer_quality again.
-     • Perform MULTIPLE targeted search_web calls.
-     • Use the judge’s missing_information field to construct each search query.
-     • Inspect search results and select AT LEAST the top 3 most relevant URLs.
-     • Call scrape_url on each selected URL.
-     • Scrape MORE than 3 URLs ONLY if clearly required to fill missing information.
-
-5. FINAL REPORT (ONE-TIME ONLY)
-   - Call write_markdown_research_report EXACTLY ONCE.
-   - Include ALL of the following as evidence:
-       • answer_query output
-       • all judge_answer_quality results
-       • search_with_scrape output (if used)
-       • all search_web results
-       • all scraped page content
-   - The analyst MUST produce a MarkdownResearchReport.
-
-────────────────────────────────────────
-OUTPUT CONSTRAINTS (HARD RULES)
-────────────────────────────────────────
-• Return ONLY the final MarkdownResearchReport.
-• Do NOT include:
-    - casual chat responses
-    - reasoning traces
-    - tool transcripts
-    - execution plans
-• Do NOT explain your workflow or decisions.
-"""
-
 
 class ResearchAssistant:
+
+    def __init__(self, settings:Settings) -> None:
+        self.settings = settings
 
     async def run_research(self, query: str) -> ResearchReport :
         """ Perform research on the given user query """
@@ -132,42 +50,20 @@ class ResearchAssistant:
             }
         ):
             with custom_span(
-                name="manager_agent_span",
+                name="manager.run",
                 data={
                     "query": query
                 }
             ):
+                tool_set = Toolset(self.settings)
                 result = await Runner.run(
-                    starting_agent=self._get_manager_agent(),
+                    starting_agent=get_manager_agent(tool_set),
                     input=prompt,
                     max_turns=20
                 )
-                logger.debug("RESULT :: ", result)
+                logger.debug("RESULT :: ", result) ## TODO::
         flush_traces()
         return result
-    
-    """ create and return manager/orchestrator agent. """
-    def _get_manager_agent(self) -> Agent:
-        name: str = "Manager Agent"
-        tools: dict = [
-            answer_query,
-            judge_answer_quality,
-            search_with_scrape,
-            search_web,
-            scrape_url,
-            analyst_tool
-        ]
-        return self._create_agent(name,tools,MANAGER_INSTRUCTIONS)
-    
-    """ create an Agent """
-    def _create_agent(self, name, instructions: str, tools: dict) -> Agent:
-        return Agent(
-            name=name,
-            tools=tools,
-            instructions=instructions,
-            model="gpt-5.4-mini",
-            output_type=ResearchReport
-        )
     
 
 

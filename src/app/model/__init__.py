@@ -1,5 +1,5 @@
 """ Application models """
 
-from app.model.research_report import ResearchReport
+from app.model.research_models import ResearchReport, Judgement
 
-__all__ = ["ResearchReport"]
+__all__ = ["ResearchReport", "Judgement"]
