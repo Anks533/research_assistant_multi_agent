@@ -26,6 +26,11 @@ class Settings(BaseSettings):
 
     openai_api_key: str
     olostep_api_key: str
+    email_pwd: str
+    to_email: str
+    smtp_server: str
+    smtp_port: int
+    from_email: str
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 
     ### ------------ Property validations ---------------
