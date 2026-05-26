@@ -3,9 +3,9 @@ from agents import function_tool, FunctionTool
 from app.config.logging import get_logger
 from app.exception.exceptions import OlostepError
 from app.config.settings import Settings
-from app.helper.helper import get_olostep_client
+from app.helper.helper import get_olostep_client, convert_to_json_string
 from olostep.models.response import AnswersResponse
-from agents import custom_span, convert_to_json_string
+from agents import custom_span
 
 import logging
 import asyncio
