@@ -1,21 +1,26 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
 from typing import Literal
+from pathlib import Path
 
 import os
+
+# Root of your project
+BASE_DIR = Path(__file__).resolve().parents[3]  # adjust if needed
+
 
 class Settings(BaseSettings):
 
     @staticmethod
     def get_env_file():
-        env = os.getenv('RA_ENV', 'development') ## default as development
+        env = os.getenv('ENV', 'development') ## default as development
         if env == "development":
-            return ".env"
-        return f".env.{env}" ## construct dynamically
+            print(BASE_DIR)
+            return BASE_DIR / ".env"
+        return BASE_DIR / f".env.{env}" ## construct dynamically
 
     model_config = SettingsConfigDict(
         env_file=get_env_file(),
-        env_prefix= "RA_",
         env_file_encoding= "utf-8"
     )
 
@@ -27,14 +32,14 @@ class Settings(BaseSettings):
     @field_validator("openai_api_key")
     @classmethod
     def validate_openai_api_key(cls, value: str) -> str :
-        if not value or value.strip():
+        if not value or not value.strip():
             raise ValueError("openai_api_key must not be empty!")
         return value
     
     @field_validator("olostep_api_key")
     @classmethod
     def validate_olostep_api_key(cls, value: str) -> str :
-        if not value or value.strip():
+        if not value or not value.strip():
             raise ValueError("olostep_api_key must not be empty!")
         return value
 

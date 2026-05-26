@@ -2,7 +2,7 @@ import logging
 from typing import Literal
 import sys
 
-LOG_FORMAT = "%{asctime}s | %{levelname}-8s | %{name}s | %{message}s"
+LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 
 """ This function will be called once during application initialization. This will setup the root logger for application. """

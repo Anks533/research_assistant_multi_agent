@@ -23,18 +23,18 @@ def convert_to_json_string(resp: dict, max_chars: int = 5000) -> str:
     return text[:max_chars] + "\n... [truncated]"
 
 """ create and return manager/orchestrator agent. """
-def get_manager_agent(tools: dict) -> Agent:
+def get_manager_agent(tools: list) -> Agent:
     name: str = "Manager Agent"
     return _create_agent(name, MANAGER_AGENT_INSTRUCTIONS, tools, ResearchReport)
     
 """ create and return judge agent. """
 def get_judge_agent() -> Agent:
     name: str = "Judge Agent"
-    return _create_agent(name, JUDGE_AGENT_INSTRUCTIONS, None, Judgement)
+    return _create_agent(name, JUDGE_AGENT_INSTRUCTIONS, [], Judgement)
 
 def get_analyst_agent() -> Agent:
     name: str = "Analyst Agent"
-    return _create_agent(name, ANALYST_AGENT_INSTRUCTIONS, None, MarkdownResearchReport)
+    return _create_agent(name, ANALYST_AGENT_INSTRUCTIONS, [], MarkdownResearchReport)
 
 def normalize_search_links(
     links: list[dict[str, Any]], limit: int = 8
@@ -54,7 +54,7 @@ def normalize_search_links(
     return rows
     
 """ create an Agent """
-def _create_agent(name, instructions: str, tools: dict | None, output_type: Any) -> Agent:
+def _create_agent(name, instructions: str, tools: list, output_type: Any) -> Agent:
     return Agent(
         name=name,
         tools=tools,
