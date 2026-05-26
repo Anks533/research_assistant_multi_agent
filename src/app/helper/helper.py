@@ -2,7 +2,7 @@ from olostep import Olostep
 from app.config.settings import Settings
 from app.agent.instruction.instructions import MANAGER_AGENT_INSTRUCTIONS, JUDGE_AGENT_INSTRUCTIONS, ANALYST_AGENT_INSTRUCTIONS
 from agents import Agent
-from app.model.research_models import ResearchReport, Judgement, MarkdownResearchReport
+from app.model.research_models import Judgement, MarkdownResearchReport
 from typing import Any
 
 import json
@@ -25,7 +25,7 @@ def convert_to_json_string(resp: dict, max_chars: int = 5000) -> str:
 """ create and return manager/orchestrator agent. """
 def get_manager_agent(tools: list) -> Agent:
     name: str = "Manager Agent"
-    return _create_agent(name, MANAGER_AGENT_INSTRUCTIONS, tools, ResearchReport)
+    return _create_agent(name, MANAGER_AGENT_INSTRUCTIONS, tools, MarkdownResearchReport)
     
 """ create and return judge agent. """
 def get_judge_agent() -> Agent:

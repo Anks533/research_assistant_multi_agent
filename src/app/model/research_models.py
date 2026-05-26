@@ -1,7 +1,9 @@
 from pydantic import BaseModel, Field
 
-class ResearchReport(BaseModel):
-    markdown_report: str
+class MarkdownResearchReport(BaseModel):
+    markdown_report: str = Field(
+        description="Complete Markdown report with polished headings, clear analysis, reader-friendly structure, and citations."
+    )
 
 class Judgement(BaseModel):
     is_good_enough: bool = Field(description="Whether evidence fully addresses the question with strong, specific, and relevant source support")
@@ -11,7 +13,3 @@ class Judgement(BaseModel):
         default_factory=list,
         description="List all important gaps that need to be fixed."
     )
-
-class MarkdownResearchReport(BaseModel):
-    """"""
-

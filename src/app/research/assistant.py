@@ -2,7 +2,7 @@ import logging
 
 from app.config.logging import get_logger
 from agents import gen_trace_id, trace, custom_span, Runner, flush_traces, RunResult
-from app.model.research_models import ResearchReport
+from app.model.research_models import MarkdownResearchReport
 from app.exception.exceptions import MultiAgentResearchException
 from app.helper.helper import get_manager_agent
 
@@ -14,12 +14,12 @@ class ResearchAssistant:
     def __init__(self, tools: list) -> None:
         self.tools = tools
 
-    async def run_research(self, query: str) -> ResearchReport :
+    async def run_research(self, query: str) -> MarkdownResearchReport :
         """ Perform research on the given user query """
         try:
             trace_id = gen_trace_id()
-            logger.debug("Trace ID for the request: ", trace_id)
-            logger.debug("Trace URI for the request: ", f"https://platform.openai.com/logs/trace?trace_id={trace_id}")
+            logger.debug("Trace ID for the request: %s", trace_id)
+            logger.debug("Trace URI for the request: %s", f"https://platform.openai.com/logs/trace?trace_id={trace_id}")
             prompt = f"""
                 Research question:
                 {query}
