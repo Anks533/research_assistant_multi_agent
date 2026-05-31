@@ -17,6 +17,7 @@ dependencies = [
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
     "pydantic-settings>=2.1.0", # .env file loading
+    "streamlit>=1.52.0",
 ]
 
 # These are not required to run app - only to develop it. So to keep production deployment lighter.

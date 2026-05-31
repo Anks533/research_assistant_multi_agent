@@ -3,6 +3,7 @@ from app.config.settings import Settings
 from app.research.assistant import ResearchAssistant
 from app.model.research_models import MarkdownResearchReport
 from app.agent.tools import build_tools
+import streamlit as st
 
 import asyncio
 
@@ -22,14 +23,23 @@ async def main():
     logger.info("Application starting...")
     logger.info("Environment loaded successfully...")
 
-    # 3️⃣ Run app
-    tools = build_tools(settings)
-    researchAgent = ResearchAssistant(tools)
-    result: MarkdownResearchReport = await researchAgent.run_research("Tell me about how AI is changing our life?")
-    with open("research_report.md", "w", encoding="utf-8") as f:
-        f.write(result.markdown_report)
+    # Title of the application
+    st.set_page_config(page_title="AI Research Assistant", layout="wide")
+    st.title("📚 AI Research Assistant Multi-Agent System")
+    question = st.text_area("Enter your research question:", height=120)
+    start = st.button("🔍 Start Research")
 
-    logger.info("Application shutdown...")
+    # 3️⃣ Run app
+    if start and question:
+        with st.spinner("Running multi-agent research..."):
+            tools = build_tools(settings)
+            researchAgent = ResearchAssistant(tools)
+            result: MarkdownResearchReport = await researchAgent.run_research(question)
+            st.success("Research completed")
+            st.write(result.markdown_report)
+            with open("research_report.md", "w", encoding="utf-8") as f:
+                f.write(result.markdown_report)
+            logger.info("Application shutdown...")
 
 if __name__ == "__main__":
     asyncio.run(main())
