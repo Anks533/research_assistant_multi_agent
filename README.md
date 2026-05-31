@@ -1,6 +1,6 @@
 # Multi-Agent Research Assistant (GenAI Systems Project)
 
-A **production-style multi-agent research system** built to demonstrate **how real GenAI systems should be orchestrated, evaluated, and governed** using **:contentReference[oaicite:0]{index=0} Agents**.
+A **production-style multi-agent research system** built to demonstrate **how real GenAI systems should be orchestrated, evaluated, and governed** using **:OpenAI Agents**.
 
 This project focuses on **agent coordination, quality gating, and evidence-driven reasoning**, not chat-style responses.
 
