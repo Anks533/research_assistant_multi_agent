@@ -123,17 +123,17 @@ Instead of vector DB-based RAG, it:
 src/
  └── app/
      ├── research/
-     │    └── assistant.py          # Entry point
+     │    └── assistant.py        # 🚀 Entry point / orchestration
      │
      ├── agent/
      │    └── instruction/
-     │         └── instructions.py   # Agent prompts
+     │         └── instructions.py # 🧠 Agent prompts & behaviors
      │
      ├── tools/
-     │    └── olostep_client.py     # API wrapper
+     │    └── olostep_client.py    # 🌐 API wrapper (assumed)
      │
      └── ...
-
+     
 ---
 
 # ⚙️ Setup
