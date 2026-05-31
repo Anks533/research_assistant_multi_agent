@@ -1,185 +1,235 @@
-# Multi-Agent Research Assistant (GenAI Systems Project)
+# 📚 Research Assistant Multi-Agent System
 
-A **production-style multi-agent research system** built to demonstrate **how real GenAI systems should be orchestrated, evaluated, and governed** using **OpenAI Agents**.
+A multi-agent AI research system that transforms a user query into a structured, validated research report using:
 
-This project focuses on **agent coordination, quality gating, and evidence-driven reasoning**, not chat-style responses.
-
----
-
-## 🔹 Project Summary
-
-**Multi-Agent Research Assistant** is a controlled research pipeline where:
-
-- One agent **orchestrates** the workflow  
-- One agent **evaluates answer quality**  
-- One agent **synthesizes evidence into a professional report**  
-
-The system **refuses to stop early** unless an objective quality threshold is met.
-
-> This project demonstrates how to design **deterministic, auditable, multi-agent GenAI systems** suitable for production environments.
+- OpenAI Agents (manager + specialized roles)
+- Olostep API (external knowledge / research grounding)
+- Multi-agent reasoning pipeline (Research → Analysis → Judge)
+- Instruction-driven agent behavior design
 
 ---
 
-## 🧠 What This Project Demonstrates
+# 🚀 What this project does
 
-- Multi-agent orchestration (not prompt chaining)  
-- Judge-driven stopping criteria  
-- Evidence-first research workflows  
-- Time-aware query handling  
-- Structured, publication-ready outputs  
-- Clear separation of agent responsibilities  
+This system takes a user query and produces a **well-structured research report** by coordinating multiple AI agents.
 
-This is **system design**, not just LLM usage.
+### Workflow
 
----
-
-## 🏗️ Architecture Overview
-
-### Agents
-
-#### 1. Manager (Master) Agent — Orchestrator
-- Controls the full research lifecycle  
-- Enforces a **mandatory execution order**  
-- Never answers from internal knowledge  
-- Makes decisions **only from tool outputs**  
-- Handles time-sensitive query normalization  
-
-This agent behaves like a **controller/service layer**, not a chatbot.
+User Query  
+→ Manager Agent (Orchestrator)  
+→ Olostep API (external knowledge retrieval)  
+→ Research Agent (fact collection & summarization)  
+→ Analysis Agent (reasoning & insights)  
+→ Judge Agent (validation & quality check)  
+→ Final Report
 
 ---
 
-#### 2. Judge (Evaluator) Agent — Quality Gate
-- Scores answers from **0.0 → 1.0**  
-- Stops research **only if score ≥ 0.85**  
-- Penalizes:
-  - Vague or generic answers  
-  - Missing or weak evidence  
-  - Outdated or stale sources  
-- Explicitly identifies **missing information** for deeper research  
+# 🧠 Architecture
 
-This prevents hallucinations and “plausible but wrong” answers.
-
----
-
-#### 3. Analyst Agent — Research Synthesizer
-- Produces the final Markdown research report  
-- Uses **only provided evidence**  
-- Introduces **no new facts**  
-- Follows a fixed, professional report structure  
-
-This agent converts raw research into **decision-ready documentation**.
+User Query
+    ↓
+Manager Agent (Orchestrator)
+    ↓
+Olostep API (Knowledge Retrieval)
+    ↓
+Research Agent (Fact Gathering)
+    ↓
+Analysis Agent (Reasoning & Insights)
+    ↓
+Judge Agent (Validation & Quality Check)
+    ↓
+Final Report
 
 ---
 
-## 🔄 Enforced Research Workflow (Deterministic)
+# 🏗️ System Design
 
-The Manager agent enforces this **non-skippable pipeline**:
-
-1. **Initial Answer**  
-   - Fast signal using an answer API  
-
-2. **Judge Evaluation**  
-   - Immediate quality assessment  
-   - Stops early only if confidence ≥ 0.85  
-
-3. **Scraped Search (Fallback)**  
-   - Expanded evidence collection  
-   - Re-judged for sufficiency  
-
-4. **Deep Research (Final Fallback)**  
-   - Multiple targeted searches  
-   - Queries derived from judge-identified gaps  
-   - Scrapes ≥ 3 authoritative sources  
-   - No further judging allowed  
-
-5. **Final Report**  
-   - Analyst generates **one** structured Markdown report  
-   - Includes **all evidence and judgments**
-
-This workflow mirrors **real research escalation**, not chat completion.
-
----
-
-## 🛠️ Tool-Augmented Design
-
-The system integrates tools for:
-
-- Answer generation  
-- Web search  
-- Web scraping  
-- Quality evaluation  
-- Report synthesis  
-
-Each tool call is **explicit, auditable, and traceable**.
+┌──────────────────────────────┐
+│        assistant.py          │  ← Entry Point
+└──────────────┬───────────────┘
+               │
+               ↓
+┌──────────────────────────────┐
+│      Manager Agent           │
+│   (Orchestration Layer)      │
+└──────────────┬───────────────┘
+               │
+     ┌─────────┼──────────┐
+     ↓         ↓          ↓
+┌────────┐ ┌────────┐ ┌────────┐
+│Research│ │Analysis│ │ Judge  │
+│ Agent  │ │ Agent  │ │ Agent  │
+└────┬───┘ └────┬───┘ └────┬───┘
+     │          │           │
+     └────┬─────┴────┬─────┘
+          ↓           ↓
+     ┌────────────────────┐
+     │   Olostep API      │
+     │ (External RAG Layer)│
+     └────────────────────┘
+               │
+               ↓
+     ┌────────────────────┐
+     │ Final Report       │
+     └────────────────────┘
 
 ---
 
-## 📄 Guaranteed Output Structure
+# 🤖 Agent Roles
 
-Every final report strictly follows:
-
-1. Executive Summary  
-2. Key Findings  
-3. Context  
-4. Evidence Review  
-5. Detailed Analysis  
-6. Implications  
-7. Source Notes  
-8. References  
-
-This ensures:
-
-- Consistent quality  
-- Easy review by non-experts  
-- Compatibility with PDFs, emails, and RAG systems  
+## 🧭 Manager Agent
+- Entry point of reasoning
+- Breaks down user query into steps
+- Decides when to use tools (Olostep API)
+- Delegates tasks to sub-agents
 
 ---
 
-## 💡 Why This Project Is Different
-
-Most GenAI demos:
-
-- Stop at “good-sounding” answers  
-- Skip evaluation  
-- Trust LLM plausibility  
-
-This system:
-
-- **Refuses to guess**  
-- **Requires evidence**  
-- **Enforces quality gates**  
-- **Separates reasoning roles**  
-- **Scales cleanly to larger agent systems**
+## 🔍 Research Agent
+- Collects factual information
+- Summarizes external knowledge
+- Ensures grounded responses
 
 ---
 
-## 👨‍💻 Ideal For
-
-- GenAI / LLM Engineer roles  
-- Backend engineers transitioning into AI  
-- AI system design interviews  
-- Research automation platforms  
-
-This project communicates **engineering maturity**, not experimentation.
+## 🧠 Analysis Agent
+- Performs reasoning over collected data
+- Extracts insights and patterns
+- Converts raw data into structured understanding
 
 ---
 
-## 🔮 Potential Extensions
-
-- Parallel research agents  
-- Domain-specific judge agents  
-- Confidence-weighted evidence scoring  
-- Vector DB / RAG integration  
-- UI for research traceability  
+## ⚖️ Judge Agent
+- Evaluates response quality
+- Detects hallucinations or inconsistencies
+- Ensures final output reliability
 
 ---
 
-## 📜 License
+# 🌐 External Dependency: Olostep API
 
-MIT License — free to use and extend.
+This system uses Olostep API as its external knowledge layer.
+
+Instead of vector DB-based RAG, it:
+- Sends query to Olostep
+- Receives contextual information
+- Feeds results into agent pipeline
 
 ---
 
-### ⭐ Portfolio Note
+# 📁 Project Structure
 
-This project was built to **demonstrate how multi-agent GenAI systems should be designed in production** — with control, evaluation, and accountability as first-class concerns.
+src/
+ └── app/
+     ├── research/
+     │    └── assistant.py          # Entry point
+     │
+     ├── agent/
+     │    └── instruction/
+     │         └── instructions.py   # Agent prompts
+     │
+     ├── tools/
+     │    └── olostep_client.py     # API wrapper
+     │
+     └── ...
+
+---
+
+# ⚙️ Setup
+
+## 1. Clone repository
+
+git clone https://github.com/Anks533/research_assistant_multi_agent.git
+cd research_assistant_multi_agent
+
+---
+
+## 2. Create virtual environment
+
+python -m venv venv
+
+Mac/Linux:
+source venv/bin/activate
+
+Windows:
+venv\Scripts\activate
+
+---
+
+## 3. Install dependencies
+
+If using pyproject.toml:
+
+pip install .
+
+OR:
+
+pip install -r requirements.txt
+
+---
+
+## 4. Environment variables
+
+Create a `.env` file:
+
+OPENAI_API_KEY=your_openai_key
+OLOSTEP_API_KEY=your_olostep_key
+
+---
+
+# ▶️ Run the project
+
+python src/app/research/assistant.py
+
+OR:
+
+python -m src.app.research.assistant
+
+---
+
+# 📤 Example Output
+
+Input:
+"What are the risks and benefits of AI in healthcare?"
+
+Output:
+- Executive summary
+- Key findings
+- Structured analysis
+- Verified insights (Judge Agent validated)
+
+---
+
+# 🔥 Key Strengths
+
+- Modular multi-agent architecture
+- Clear separation of responsibilities
+- External knowledge grounding via API
+- Built-in validation layer (Judge Agent)
+- Highly extensible design
+
+---
+
+# ⚠️ Limitations
+
+- No persistent memory system
+- Depends on external Olostep API
+- Orchestration is LLM-driven (non-deterministic)
+- Limited observability per agent step
+
+---
+
+# 🚀 Future Improvements
+
+- Add DAG-based orchestration (LangGraph style)
+- Add memory layer (short + long term)
+- Add tracing per agent execution
+- Add retry loop based on Judge feedback
+- Add fallback RAG system
+
+---
+
+# 🧠 Summary
+
+A multi-agent AI research system that uses OpenAI + Olostep API to generate validated, structured research reports through specialized agents.
