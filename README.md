@@ -1,3 +1,9 @@
+
+
+https://github.com/user-attachments/assets/d3f2aeed-865c-45e9-b365-178ac9a2dbea
+
+
+
 # 📚 Research Assistant Multi-Agent System
 
 A multi-agent AI research system that transforms a user query into a structured, validated research report using:
