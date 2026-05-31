@@ -121,6 +121,7 @@ Instead of vector DB-based RAG, it:
 
 # 📁 Project Structure
 
+```
 src/
  └── app/
      ├── research/
@@ -134,7 +135,8 @@ src/
      │    └── olostep_client.py    # 🌐 API wrapper (assumed)
      │
      └── ...
-     
+
+```
 ---
 
 # ⚙️ Setup
