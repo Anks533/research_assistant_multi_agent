@@ -27,6 +27,7 @@ User Query
 
 # 🧠 Architecture
 
+```
 User Query
     ↓
 Manager Agent (Orchestrator)
@@ -40,6 +41,8 @@ Analysis Agent (Reasoning & Insights)
 Judge Agent (Validation & Quality Check)
     ↓
 Final Report
+
+```
 
 ---
 
