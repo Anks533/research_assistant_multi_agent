@@ -3,7 +3,7 @@
 A production-style multi-agent research system built to demonstrate how real GenAI systems should be orchestrated, evaluated, and governed using OpenAI Agents.
 This project focuses on agent coordination, quality gating, and evidence-driven reasoning, not chat-style responses.
 
-**🔹 Project Summary (Resume-Ready)**
+**🔹 Project Summary**
 
 Multi-Agent Research Assistant is a controlled research pipeline where:
 One agent orchestrates the workflow
