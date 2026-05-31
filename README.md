@@ -177,7 +177,9 @@ pip install -r requirements.txt
 Create a `.env` file:
 
 OPENAI_API_KEY=your_openai_key
+
 OLOSTEP_API_KEY=your_olostep_key
+
 
 ---
 
