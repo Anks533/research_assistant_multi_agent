@@ -45,6 +45,7 @@ Final Report
 
 # 🏗️ System Design
 
+```
 ┌──────────────────────────────┐
 │        assistant.py          │  ← Entry Point
 └──────────────┬───────────────┘
@@ -73,7 +74,7 @@ Final Report
      ┌────────────────────┐
      │ Final Report       │
      └────────────────────┘
-
+```
 ---
 
 # 🤖 Agent Roles
